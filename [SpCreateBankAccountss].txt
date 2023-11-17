@@ -1,0 +1,34 @@
+USE [mvcbankmanagement]
+GO
+/****** Object:  StoredProcedure [dbo].[SpCreateBankAccountss]    Script Date: 11/17/2023 9:55:44 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER PROCEDURE [dbo].[SpCreateBankAccountss] (
+    @UserId INT,
+	@BranchName VARCHAR(50),
+    @AccountNumber VARCHAR(14),
+    @IFSCCode VARCHAR(11),
+	@OpenDate DATE,
+	@Balance DECIMAL
+)
+AS
+BEGIN
+    -- Declare variables to store FirstName and LastName
+    DECLARE @FirstName VARCHAR(50);
+    DECLARE @LastName VARCHAR(50);
+
+    -- Get FirstName and LastName based on UserId
+    SELECT @FirstName = FirstName, @LastName = LastName
+    FROM tbl_registeruser
+    WHERE BankId = @UserId;
+
+    -- Concatenate FirstName and LastName to create AccountHolderName
+    DECLARE @AccountHolderName VARCHAR(100);
+    SET @AccountHolderName = @FirstName + ' ' + @LastName;
+
+    -- Insert into tbl_bankaccount table
+    INSERT INTO tbl_bankaccount (UserId, AccountHolderName, BranchName, AccountNumber, IFSCCode, OpenDate, Balance)
+    VALUES (@UserId, @AccountHolderName, @BranchName, @AccountNumber, @IFSCCode, @OpenDate, @Balance);
+END;

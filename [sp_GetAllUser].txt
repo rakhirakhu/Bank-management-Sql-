@@ -1,0 +1,12 @@
+USE [mvcbankmanagement]
+GO
+/****** Object:  StoredProcedure [dbo].[sp_GetAllUser]    Script Date: 11/17/2023 9:31:33 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER procedure [dbo].[sp_GetAllUser]
+as
+begin
+select * from tbl_registeruser
+end;

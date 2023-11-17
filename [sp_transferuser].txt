@@ -1,0 +1,116 @@
+USE [mvcbankmanagement]
+GO
+/****** Object:  StoredProcedure [dbo].[sp_transferuser]    Script Date: 11/17/2023 9:53:43 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER PROCEDURE [dbo].[sp_transferuser]
+    @UserId INT,
+    @ToUserId INT,
+    @Amount DECIMAL(18, 2),
+    @AccountNumber VARCHAR(14),
+    @IFSCCode VARCHAR(11),
+    @ToAccountNumber VARCHAR(14),
+    @ToIFSCCode VARCHAR(11),
+    @Password VARCHAR(50)
+AS
+BEGIN
+    DECLARE @CurrentBalance DECIMAL(18, 2);
+
+    DECLARE @SenderUsername VARCHAR(50);
+    DECLARE @ReceiverUsername VARCHAR(50);
+
+    -- Get the Username for the sender
+    SELECT @SenderUsername = Username
+    FROM tbl_registeruser
+    WHERE BankId = @UserId;
+
+    -- Get the Username for the receiver
+    SELECT @ReceiverUsername = Username
+    FROM tbl_registeruser
+    WHERE BankId = @ToUserId;
+
+    -- Check if UserId is valid for the sender
+    IF @SenderUsername IS NULL
+    BEGIN
+        THROW 51000, 'Invalid Sender UserId', 1;
+        RETURN;
+    END;
+
+    -- Check if ToUserId is valid for the receiver
+    IF @ReceiverUsername IS NULL
+    BEGIN
+        THROW 51000, 'Invalid Receiver UserId', 1;
+        RETURN;
+    END;
+
+    -- Check if the provided AccountNumber and IFSCCode match the sender's bank account
+    IF NOT EXISTS (
+        SELECT 1
+        FROM tbl_bankaccount AS ba
+        WHERE ba.UserId = @UserId 
+            AND ba.AccountNumber = @AccountNumber 
+            AND ba.IFSCCode = @IFSCCode 
+            AND EXISTS (
+                SELECT 1
+                FROM tbl_loginn AS ln
+                WHERE ln.Username = @SenderUsername
+                    AND ln.Password = @Password
+                    AND ln.UserType = 'user'
+            )
+    )
+    BEGIN
+        THROW 51000, 'Invalid Sender AccountNumber or IFSCCode', 1;
+        RETURN;
+    END;
+
+    -- Check if the provided ToAccountNumber and ToIFSCCode match the receiver's bank account (excluding the sender's account)
+    IF NOT EXISTS (
+        SELECT 1
+        FROM tbl_bankaccount
+        WHERE UserId = @ToUserId AND AccountNumber = @ToAccountNumber AND IFSCCode = @ToIFSCCode
+          AND (UserId <> @UserId OR (UserId = @UserId AND AccountNumber <> @AccountNumber AND IFSCCode <> @IFSCCode))
+    )
+    BEGIN
+        THROW 51000, 'Invalid Receiver AccountNumber or IFSCCode', 1;
+        RETURN;
+    END;
+
+    -- Get the current balance
+    SELECT @CurrentBalance = Balance
+    FROM tbl_bankaccount
+    WHERE UserId = @UserId AND AccountNumber = @AccountNumber AND IFSCCode = @IFSCCode;
+
+    -- Check if the transfer amount is valid
+    IF @Amount <= 0
+    BEGIN
+        PRINT 'Error: Transfer amount must be greater than 0.';
+        RETURN;
+    END
+    ELSE IF @Amount > @CurrentBalance
+    BEGIN
+        PRINT 'Error: Insufficient funds for Transfer.';
+        RETURN;
+    END
+
+    -- Deduct from sender's account
+    UPDATE tbl_bankaccount
+    SET Balance = Balance - @Amount
+    WHERE UserId = @UserId AND AccountNumber = @AccountNumber AND IFSCCode = @IFSCCode;
+
+    -- Add to receiver's account
+    UPDATE tbl_bankaccount
+    SET Balance = Balance + @Amount
+    WHERE UserId = @ToUserId AND AccountNumber = @ToAccountNumber AND IFSCCode = @ToIFSCCode;
+
+    -- Insert into Transaction table for sender
+    INSERT INTO [dbo].[Transaction] (UserId, Type, Amount, Date, AccountNumber, IFSCCode)
+    VALUES (@UserId, 'Transfer', @Amount, GETDATE(), @AccountNumber, @IFSCCode);
+
+    -- Insert into Transaction table for receiver
+    INSERT INTO [dbo].[Transaction] (UserId, Type, Amount, Date, AccountNumber, IFSCCode)
+    VALUES (@ToUserId, 'Credited', @Amount, GETDATE(), @ToAccountNumber, @ToIFSCCode);
+
+    PRINT 'Transfer successful.';
+END;

@@ -1,0 +1,17 @@
+USE [mvcbankmanagement]
+GO
+/****** Object:  StoredProcedure [dbo].[sp_CheckAccountNumberExists]    Script Date: 11/17/2023 9:21:59 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER PROCEDURE [dbo].[sp_CheckAccountNumberExists]
+    @AccountNumber NVARCHAR(50)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT COUNT(*) AS AccountNumberCount
+    FROM tbl_bankaccount
+    WHERE AccountNumber = @AccountNumber;
+END;

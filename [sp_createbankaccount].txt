@@ -1,0 +1,23 @@
+USE [mvcbankmanagement]
+GO
+/****** Object:  StoredProcedure [dbo].[sp_createbankaccount]    Script Date: 11/17/2023 9:27:09 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+ALTER PROCEDURE [dbo].[sp_createbankaccount] (
+    @UserId INT,
+	@AccountHolderName VARCHAR(50),
+	@BranchName VARCHAR(50),
+    @AccountNumber VARCHAR(14),
+    @IFSCCode VARCHAR(11),
+	@OpenDate DATE,
+	@Balance DECIMAL
+)
+AS
+BEGIN
+    -- Insert into tbl_bankaccount table
+    INSERT INTO tbl_bankaccount (UserId,AccountHolderName,BranchName,AccountNumber,IFSCCode,OpenDate,Balance)
+    VALUES (@UserId,@AccountHolderName,@BranchName,@AccountNumber,@IFSCCode,@OpenDate,@Balance);
+END;

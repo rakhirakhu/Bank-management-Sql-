@@ -1,0 +1,16 @@
+USE [mvcbankmanagement]
+GO
+/****** Object:  StoredProcedure [dbo].[SP_EnquiryUser]    Script Date: 11/17/2023 9:30:20 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER procedure [dbo].[SP_EnquiryUser]
+@Name varchar(50),
+@Email varchar(50),
+@Comment varchar(150)
+as
+begin
+insert into Tbl_Enquiry(Name,Email,Comment)
+values(@Name,@Email,@Comment);
+end

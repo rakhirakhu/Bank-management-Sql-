@@ -1,0 +1,12 @@
+USE [mvcbankmanagement]
+GO
+/****** Object:  StoredProcedure [dbo].[SP_EnquiryDetails]    Script Date: 11/17/2023 9:29:52 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER PROCEDURE [dbo].[SP_EnquiryDetails]
+AS
+BEGIN
+SELECT * FROM Tbl_Enquiry
+end

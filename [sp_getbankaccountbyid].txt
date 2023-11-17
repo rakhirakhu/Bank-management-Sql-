@@ -1,0 +1,14 @@
+USE [mvcbankmanagement]
+GO
+/****** Object:  StoredProcedure [dbo].[sp_getbankaccountbyid]    Script Date: 11/17/2023 9:33:21 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER procedure [dbo].[sp_getbankaccountbyid]
+@BankId int
+as
+begin
+select * from tbl_bankaccount
+where userID=@BankId;
+end

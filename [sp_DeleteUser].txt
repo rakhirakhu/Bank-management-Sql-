@@ -1,0 +1,21 @@
+USE [mvcbankmanagement]
+GO
+/****** Object:  StoredProcedure [dbo].[sp_DeleteUser]    Script Date: 11/17/2023 9:28:51 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER PROCEDURE [dbo].[sp_DeleteUser]
+  @BankId INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+	    DELETE FROM [dbo].[tbl_loginn] WHERE [Username] IN (SELECT [Username] FROM [dbo].[tbl_registeruser] WHERE [BankId] = @BankId);
+
+
+    -- Delete related records in tbl_bankaccount first
+    DELETE FROM [dbo].[tbl_bankaccount] WHERE [UserId] = @BankId;
+
+    -- Now delete the user
+    DELETE FROM [dbo].[tbl_registeruser] WHERE [BankId] = @BankId;
+END;

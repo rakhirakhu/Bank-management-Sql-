@@ -1,0 +1,15 @@
+USE [mvcbankmanagement]
+GO
+/****** Object:  StoredProcedure [dbo].[sp_GetUserIdByAccountNumber]    Script Date: 11/17/2023 9:36:24 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER PROCEDURE [dbo].[sp_GetUserIdByAccountNumber]
+    @ToAccountNumber VARCHAR(50)
+AS
+BEGIN
+    SELECT UserId
+    FROM tbl_bankaccount
+    WHERE AccountNumber = @ToAccountNumber;
+END;

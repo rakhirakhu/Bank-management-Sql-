@@ -1,0 +1,14 @@
+USE [mvcbankmanagement]
+GO
+/****** Object:  StoredProcedure [dbo].[sp_GetUserByUsernameeee]    Script Date: 11/17/2023 9:35:59 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER PROCEDURE [dbo].[sp_GetUserByUsernameeee] (
+    @Username VARCHAR(50)
+)
+AS
+BEGIN
+    SELECT * FROM tbl_registeruser WHERE Username = @Username;
+END;

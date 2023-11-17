@@ -1,0 +1,18 @@
+USE [mvcbankmanagement]
+GO
+
+/****** Object:  Table [dbo].[tbl_loginn]    Script Date: 11/17/2023 9:15:40 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[tbl_loginn](
+	[Username] [varchar](50) NULL,
+	[Password] [varchar](50) NULL,
+	[usertype] [varchar](50) NULL
+) ON [PRIMARY]
+GO
+
+

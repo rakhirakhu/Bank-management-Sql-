@@ -1,0 +1,21 @@
+USE [mvcbankmanagement]
+GO
+/****** Object:  StoredProcedure [dbo].[sp_CheckLoanDate]    Script Date: 11/17/2023 9:23:50 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+ALTER PROCEDURE [dbo].[sp_CheckLoanDate]
+    @UserId INT,
+    @LoanDate DATE OUTPUT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT @LoanDate = LoanDate
+    FROM OneClickLoanTable
+    WHERE UserId = @UserId
+        AND MONTH(LoanDate) = MONTH(GETDATE())
+        AND YEAR(LoanDate) = YEAR(GETDATE());
+END

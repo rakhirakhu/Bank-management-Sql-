@@ -1,0 +1,16 @@
+USE [mvcbankmanagement]
+GO
+/****** Object:  StoredProcedure [dbo].[sp_getusertransaction]    Script Date: 11/17/2023 9:50:58 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+ALTER PROCEDURE [dbo].[sp_getusertransaction]
+    
+AS
+BEGIN
+    SELECT *
+    FROM [dbo].[Transaction]
+   
+END;

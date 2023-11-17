@@ -1,0 +1,37 @@
+USE [mvcbankmanagement]
+GO
+/****** Object:  StoredProcedure [dbo].[sp_adminregister]    Script Date: 11/17/2023 9:19:15 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER PROCEDURE [dbo].[sp_adminregister] (
+    @FirstName VARCHAR(50),
+    @LastName VARCHAR(50),
+    @DOB DATE,
+    @Gender VARCHAR(50),
+    @Phone VARCHAR(50),
+    @Email VARCHAR(50),
+    @Address VARCHAR(50),
+    @State VARCHAR(50),
+    @City VARCHAR(50),
+    @Username VARCHAR(50),
+    @Password VARCHAR(50)
+)
+AS
+BEGIN
+
+   
+
+    -- Insert into registeruser table
+    INSERT INTO tbl_adminregister(FirstName, LastName, DOB, Gender, Phone, Email, Address, State, City, Username, Password )
+    VALUES (@FirstName, @LastName, @DOB, @Gender, @Phone, @Email, @Address, @State, @City, @Username, @Password );
+
+    -- Get the bankid of the last inserted record
+    
+
+    -- Insert into loginuser table
+    INSERT INTO tbl_loginn ( Username, Password, usertype)
+    VALUES (@Username, @Password, 'admin');
+
+END;

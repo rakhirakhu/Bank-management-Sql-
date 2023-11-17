@@ -1,0 +1,22 @@
+USE [mvcbankmanagement]
+GO
+/****** Object:  StoredProcedure [dbo].[sp_getbalance]    Script Date: 11/17/2023 9:31:59 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER PROCEDURE [dbo].[sp_getbalance]
+
+ @UserId INT,
+    @AccountNumber VARCHAR(14),
+    @IFSCCode VARCHAR(11)
+AS
+BEGIN
+    DECLARE @Balance DECIMAL(18, 2);
+
+    SELECT @Balance = Balance
+    FROM tbl_bankaccount
+    WHERE UserId = @UserId AND AccountNumber = @AccountNumber AND IFSCCode = @IFSCCode;
+
+    SELECT @Balance AS Balance;
+END;

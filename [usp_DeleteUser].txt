@@ -1,0 +1,16 @@
+USE [mvcbankmanagement]
+GO
+/****** Object:  StoredProcedure [dbo].[usp_DeleteUser]    Script Date: 11/17/2023 9:56:35 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+ALTER PROCEDURE [dbo].[usp_DeleteUser]
+    @BankId INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DELETE FROM [dbo].[tbl_registeruser] WHERE [BankId] = @BankId;
+END;

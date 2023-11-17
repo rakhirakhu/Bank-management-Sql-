@@ -1,0 +1,19 @@
+USE [mvcbankmanagement]
+GO
+/****** Object:  StoredProcedure [dbo].[sp_logtransaction]    Script Date: 11/17/2023 9:52:18 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER PROCEDURE [dbo].[sp_logtransaction]
+@TransactionId INT,
+    @UserId INT,
+    @Type NVARCHAR(50),
+    @Amount DECIMAL(18, 2),
+    @AccountNumber VARCHAR(14) = NULL,
+    @IFSCCode VARCHAR(11) = NULL
+AS
+BEGIN
+    INSERT INTO [dbo].[Transaction] (TransactionId,[UserId], [Type], [Amount], [Date], [AccountNumber], [IFSCCode])
+    VALUES (@TransactionId,@UserId, @Type, @Amount, GETUTCDATE(), @AccountNumber, @IFSCCode);
+END;

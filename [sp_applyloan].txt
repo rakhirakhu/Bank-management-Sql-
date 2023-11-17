@@ -1,0 +1,78 @@
+USE [mvcbankmanagement]
+GO
+/****** Object:  StoredProcedure [dbo].[sp_applyloan]    Script Date: 11/17/2023 9:19:46 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+ALTER PROCEDURE [dbo].[sp_applyloan]
+    @UserId INT,
+    @Amount DECIMAL(18, 2),
+    @AccountNumber VARCHAR(14),
+    @IFSCCode VARCHAR(11),
+    @PANCardNumber VARCHAR(20),
+    @Password VARCHAR(50)
+AS
+BEGIN
+    DECLARE @CurrentBalance DECIMAL(18, 2);
+    DECLARE @Username VARCHAR(50);
+
+    -- Get the Username for the given UserId
+    SELECT @Username = Username
+    FROM tbl_registeruser
+    WHERE BankId = @UserId;
+
+    IF @Username IS NULL
+    BEGIN
+        -- If UserId not found, raise an error or handle as needed
+        THROW 51000, 'Invalid UserId', 1;
+        RETURN;
+    END;
+
+    IF NOT EXISTS (
+        SELECT 1
+        FROM tbl_bankaccount AS ba
+        WHERE ba.UserId = @UserId 
+            AND ba.AccountNumber = @AccountNumber 
+            AND ba.IFSCCode = @IFSCCode 
+            AND EXISTS (
+                SELECT 1
+                FROM tbl_loginn AS ln
+                WHERE ln.Username = @Username
+                    AND ln.Password = @Password
+                    AND ln.UserType = 'user'
+            )
+    )
+    BEGIN
+        -- If not matching, raise an error or handle as needed
+        THROW 51000, 'Invalid AccountNumber or IFSCCode', 1;
+        RETURN;
+    END;
+
+    -- Additional checks for loan eligibility can be added here
+
+    -- Check if the user has a valid PAN Card
+    IF LEN(@PANCardNumber) <> 20
+    BEGIN
+        -- If the PAN Card number is not of the expected length, raise an error or handle as needed
+        THROW 51000, 'Invalid PAN Card Number', 1;
+        RETURN;
+    END;
+
+    -- Perform additional loan eligibility checks as needed
+
+    -- Update the user's balance with the loan amount
+    SELECT @CurrentBalance = [Balance]
+    FROM tbl_bankaccount
+    WHERE UserId = @UserId AND AccountNumber = @AccountNumber AND IFSCCode = @IFSCCode;
+
+    UPDATE tbl_bankaccount
+    SET [Balance] = @CurrentBalance + @Amount
+    WHERE UserId = @UserId AND AccountNumber = @AccountNumber AND IFSCCode = @IFSCCode;
+
+    -- Insert a record into the Transaction table for the loan
+    INSERT INTO [dbo].[Transaction] (UserId, Type, Amount, Date, AccountNumber, IFSCCode)
+    VALUES (@UserId, 'Loan', @Amount, GETDATE(), @AccountNumber, @IFSCCode);
+
+END;

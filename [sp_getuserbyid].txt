@@ -1,0 +1,20 @@
+USE [mvcbankmanagement]
+GO
+/****** Object:  StoredProcedure [dbo].[sp_getuserbyid]    Script Date: 11/17/2023 9:35:15 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER PROCEDURE [dbo].[sp_getuserbyid]
+    @UserId INT
+AS
+BEGIN
+    SELECT
+        BankId,
+        FirstName,
+        LastName
+    FROM
+        tbl_registeruser
+    WHERE
+        BankId = @UserId;
+END;

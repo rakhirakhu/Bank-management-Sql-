@@ -1,0 +1,17 @@
+USE [mvcbankmanagement]
+GO
+/****** Object:  StoredProcedure [dbo].[sp_CheckPhoneNumberExists]    Script Date: 11/17/2023 9:24:55 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER PROCEDURE [dbo].[sp_CheckPhoneNumberExists]
+    @Phone NVARCHAR(50)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT COUNT(*) AS PhoneCount
+    FROM tbl_registeruser
+    WHERE Phone = @Phone;
+END;

@@ -1,0 +1,17 @@
+USE [mvcbankmanagement]
+GO
+/****** Object:  StoredProcedure [dbo].[sp_CheckEmailExist]    Script Date: 11/17/2023 9:22:31 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER PROCEDURE [dbo].[sp_CheckEmailExist]
+    @Email VARCHAR(50)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT COUNT(*) 
+    FROM tbl_registeruser
+    WHERE Email = @Email;
+END;

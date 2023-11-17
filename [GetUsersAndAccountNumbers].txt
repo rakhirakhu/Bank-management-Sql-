@@ -1,0 +1,14 @@
+USE [mvcbankmanagement]
+GO
+/****** Object:  StoredProcedure [dbo].[GetUsersAndAccountNumbers]    Script Date: 11/17/2023 9:17:55 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER PROCEDURE [dbo].[GetUsersAndAccountNumbers]
+AS
+BEGIN
+    SELECT u.*, b.AccountNumber
+    FROM tbl_registeruser u
+    left JOIN tbl_bankaccount b ON u.BankId = b.UserID;
+END;

@@ -1,0 +1,57 @@
+USE [mvcbankmanagement]
+GO
+/****** Object:  StoredProcedure [dbo].[sp_transferfund]    Script Date: 11/17/2023 9:53:18 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER PROCEDURE [dbo].[sp_transferfund]
+    @FromUserId INT,
+    @ToUserId INT,
+    @Amount DECIMAL,
+    @FromAccountNumber VARCHAR(14),
+    @FromIFSCCode VARCHAR(11),
+    @ToAccountNumber VARCHAR(14),
+    @ToIFSCCode VARCHAR(11)
+AS
+BEGIN
+    BEGIN TRY
+        -- Start the transaction
+        BEGIN TRANSACTION;
+
+        -- Check if the source account has sufficient balance
+        DECLARE @SourceAccountBalance DECIMAL;
+        SELECT @SourceAccountBalance = Balance
+        FROM tbl_bankaccount
+        WHERE UserId = @FromUserId AND AccountNumber = @FromAccountNumber AND IFSCCode = @FromIFSCCode;
+
+        IF @SourceAccountBalance < @Amount
+        BEGIN
+            -- Rollback the transaction if there's an insufficient balance
+            ROLLBACK;
+            THROW 50000, 'Insufficient balance for the fund transfer.', 1;
+        END
+
+        -- Perform the withdrawal from the source account
+        EXEC sp_withdraw
+            @UserId = @FromUserId,
+            @Amount = @Amount,
+            @AccountNumber = @FromAccountNumber,
+            @IFSCCode = @FromIFSCCode;
+
+        -- Perform the deposit to the destination account
+        EXEC sp_deposit
+            @UserId = @ToUserId,
+            @Amount = @Amount,
+            @AccountNumber = @ToAccountNumber,
+            @IFSCCode = @ToIFSCCode;
+
+        -- Commit the transaction
+        COMMIT;
+    END TRY
+    BEGIN CATCH
+        -- Rollback if an error occurred
+        ROLLBACK;
+        THROW;
+    END CATCH
+END;

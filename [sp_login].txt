@@ -1,0 +1,19 @@
+USE [mvcbankmanagement]
+GO
+/****** Object:  StoredProcedure [dbo].[sp_login]    Script Date: 11/17/2023 9:51:49 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER PROCEDURE [dbo].[sp_login]
+    @Username VARCHAR(50),
+    @Password VARCHAR(50),
+    @usertype VARCHAR(50) OUTPUT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    SELECT @usertype = usertype
+    FROM tbl_loginn
+    WHERE Username = @Username AND Password = @Password;
+END

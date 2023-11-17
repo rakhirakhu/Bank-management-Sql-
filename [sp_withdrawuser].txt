@@ -1,0 +1,81 @@
+USE [mvcbankmanagement]
+GO
+/****** Object:  StoredProcedure [dbo].[sp_withdrawuser]    Script Date: 11/17/2023 9:55:11 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER PROCEDURE [dbo].[sp_withdrawuser]
+    @UserId INT,
+    @Amount DECIMAL(18, 2),
+    @AccountNumber VARCHAR(14),
+    @IFSCCode VARCHAR(11),
+    @Password VARCHAR(50)
+AS
+BEGIN
+    DECLARE @CurrentBalance DECIMAL(18, 2);
+
+    -- Check if the provided AccountNumber and IFSCCode match the user's bank account
+    DECLARE @Username VARCHAR(50);
+
+    -- Get the Username for the given UserId
+    SELECT @Username = Username
+    FROM tbl_registeruser
+    WHERE BankId = @UserId;
+
+    IF @Username IS NULL
+    BEGIN
+        -- If UserId not found, raise an error or handle as needed
+        THROW 51000, 'Invalid UserId', 1;
+        RETURN;
+    END;
+
+    IF NOT EXISTS (
+        SELECT 1
+        FROM tbl_bankaccount AS ba
+        WHERE ba.UserId = @UserId 
+            AND ba.AccountNumber = @AccountNumber 
+            AND ba.IFSCCode = @IFSCCode 
+            AND EXISTS (
+                SELECT 1
+                FROM tbl_loginn AS ln
+                WHERE ln.Username = @Username
+                    AND ln.Password = @Password
+                    AND ln.UserType = 'user'
+            )
+    )
+    BEGIN
+        -- If not matching, raise an error or handle as needed
+        THROW 51000, 'Invalid AccountNumber or IFSCCode', 1;
+        RETURN;
+    END;
+
+    -- Get the current balance
+    SELECT @CurrentBalance = Balance
+    FROM tbl_bankaccount
+    WHERE UserId = @UserId AND AccountNumber = @AccountNumber AND IFSCCode = @IFSCCode;
+
+    IF @Amount <= 0
+    BEGIN
+        -- Withdrawal amount is less than or equal to 0, show an error message
+        PRINT 'Error: Withdrawal amount must be greater than 0.';
+    END
+    ELSE IF @Amount > @CurrentBalance
+    BEGIN
+        -- Withdrawal amount is greater than the current balance, show an error message
+        PRINT 'Error: Insufficient funds for withdrawal.';
+    END
+    ELSE
+    BEGIN
+        -- Perform the withdrawal
+        UPDATE tbl_bankaccount
+        SET Balance = Balance - @Amount
+        WHERE UserId = @UserId AND AccountNumber = @AccountNumber AND IFSCCode = @IFSCCode;
+
+        -- Insert into Transaction table
+        INSERT INTO [dbo].[Transaction] (UserId, Type, Amount, Date, AccountNumber, IFSCCode)
+        VALUES (@UserId, 'Withdrawal', @Amount, GETDATE(), @AccountNumber, @IFSCCode);
+        
+        PRINT 'Withdrawal successful.';
+    END;
+END;

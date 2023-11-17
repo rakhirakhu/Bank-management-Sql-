@@ -1,0 +1,22 @@
+USE [mvcbankmanagement]
+GO
+/****** Object:  StoredProcedure [dbo].[sp_hasappliedforloanthismonth]    Script Date: 11/17/2023 9:51:23 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER PROCEDURE [dbo].[sp_hasappliedforloanthismonth]
+    @UserId INT
+AS
+BEGIN
+    DECLARE @AppliedCount INT;
+
+    SELECT @AppliedCount = COUNT(*)
+    FROM [dbo].[Transaction]
+    WHERE UserId = @UserId
+      AND Type = 'Loan'
+      AND MONTH(Date) = MONTH(GETDATE())
+      AND YEAR(Date) = YEAR(GETDATE());
+
+    RETURN @AppliedCount;
+END;

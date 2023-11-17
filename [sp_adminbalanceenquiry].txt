@@ -1,0 +1,15 @@
+USE [mvcbankmanagement]
+GO
+/****** Object:  StoredProcedure [dbo].[sp_adminbalanceenquiry]    Script Date: 11/17/2023 9:18:42 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER PROCEDURE [dbo].[sp_adminbalanceenquiry]
+    
+AS
+BEGIN
+    SELECT UserId,AccountNumber, IFSCCode, Balance
+    FROM tbl_bankaccount
+    
+END;
